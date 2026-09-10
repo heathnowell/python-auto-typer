@@ -1,55 +1,61 @@
-# Python Password Manager
+# Python Auto Typer
 
-A command-line password manager written in Python that stores account passwords in an encrypted local file.
+A desktop typing-automation application built with Python and Tkinter.
 
-The project uses **Fernet symmetric encryption** to encrypt and decrypt stored passwords and **bcrypt** to verify the master password.
+The application accepts user-provided text and types it through the keyboard controller at a configurable speed. It also includes hotkey controls, progress tracking, estimated completion time, optional simulated typing errors, and pauses.
 
 ## Features
 
-- Add and store account credentials
-- Encrypt passwords before saving them locally
-- View and decrypt saved passwords after authentication
-- Remove individual saved credentials
-- Delete the local password file
-- Protect access with a master password
-- Validate the user-provided Fernet encryption key
+- Desktop GUI built with Tkinter
+- Paste or enter text to be typed automatically
+- Adjustable typing speed in words per minute (WPM)
+- Adjustable simulated typo rate
+- Configurable global hotkey
+- Start, stop, pause, and resume controls
+- Progress bar and percentage tracking
+- Estimated remaining time
+- Word-based and randomized pauses
+- Simulated nearby-key typing mistakes followed by correction
+- Background threads so the interface remains responsive
 
 ## Technologies
 
 - Python
-- `cryptography` / Fernet
-- `bcrypt`
-- JSON
-- Python `os` module
+- Tkinter
+- `pynput`
+- Threading
+- Regular expressions
+- Randomization
+- Time-based event handling
 
 ## Project Structure
 
 ```text
-python-password-manager/
-├── password_manager.py
+python-auto-typer/
+├── autotype.py
 ├── README.md
 ├── requirements.txt
 └── .gitignore
 ```
-
-The program creates a local `passwords.json` file when credentials are saved.
 
 ## Installation
 
 Clone the repository:
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/python-password-manager.git
-cd python-password-manager
+git clone https://github.com/YOUR-USERNAME/python-auto-typer.git
+cd python-auto-typer
 ```
 
-Install the required packages:
+Install the required dependency:
 
 ```bash
-pip install cryptography bcrypt
+pip install pynput
 ```
 
-Or, if the repository includes a `requirements.txt` file:
+Tkinter is included with many standard Python installations. Depending on your operating system, it may need to be installed separately.
+
+If the repository includes a `requirements.txt` file:
 
 ```bash
 pip install -r requirements.txt
@@ -57,106 +63,88 @@ pip install -r requirements.txt
 
 ## Usage
 
-Run the program:
+Run the application:
 
 ```bash
-python password_manager.py
+python autotype.py
 ```
 
-The application will:
+Then:
 
-1. Ask for the master password.
-2. Ask for a valid Fernet encryption key.
-3. Allow you to add, view, remove, or delete stored credentials.
-4. Save encrypted passwords to `passwords.json` when the program exits normally.
+1. Enter or paste text into the text box.
+2. Set the desired WPM.
+3. Set the desired typo percentage.
+4. Optionally choose a custom hotkey.
+5. Click **Start Typing**.
+6. Move your cursor to the application where the text should be entered.
+7. Press the configured hotkey to begin.
+8. Press the hotkey again to pause or resume.
+9. Use **Stop** to end the typing process.
 
-Available commands:
+The default hotkey is:
 
 ```text
-view
-add
-remove
-remove file
-q
+Print Screen
 ```
 
 ## How It Works
 
-### Master Password Authentication
+### Typing Speed
 
-The entered master password is checked against a stored **bcrypt hash**:
-
-```python
-bcrypt.checkpw(entered_password, master_password_hash)
-```
-
-### Password Encryption
-
-Passwords are encrypted before being stored:
+The program converts the selected WPM into a delay between characters:
 
 ```python
-encrypted_password = fer.encrypt(password.encode())
+type_delay = 60 / (wpm * 5)
 ```
 
-They are decrypted only when the user chooses to view them:
+### Typing Automation
 
-```python
-decrypted_password = fer.decrypt(encrypted_password).decode()
-```
+The application uses `pynput.keyboard.Controller` to send keyboard input one character at a time.
 
-### Local Storage
+### Simulated Errors
 
-Encrypted credentials are serialized into JSON and written to:
+The project includes a map of nearby keyboard keys. When an error is triggered, it types a nearby character, waits briefly, presses Backspace, and then continues.
 
-```text
-passwords.json
-```
+### Pause Pattern
 
-## Security Notes
+The program creates a repeatable sequence of word-count intervals and pauses after those intervals while typing.
 
-This project was built as a learning project and has **not been security-audited for production use**.
+### Progress and Time Estimation
 
-Before publishing or distributing the project:
+A background thread tracks:
 
-- Do not upload your real `passwords.json` file.
-- Do not publish a bcrypt hash tied to a master password that you use elsewhere.
-- Consider changing the program so each user creates a master password during initial setup.
-- Consider generating and securely storing or deriving the encryption key instead of requiring the user to manually paste it each time.
+- Characters typed
+- Percentage complete
+- Estimated time remaining
 
-Recommended `.gitignore` entries:
-
-```gitignore
-passwords.json
-__pycache__/
-*.pyc
-.venv/
-venv/
-```
+This allows the GUI to update while the typing process is running.
 
 ## What I Learned
 
 This project helped me practice:
 
-- Symmetric encryption
-- Password hashing and authentication
-- Local data storage with JSON
-- File handling
-- Error handling
-- Building a menu-driven Python application
-- Applying cybersecurity concepts in a practical project
+- GUI development with Tkinter
+- Keyboard input automation
+- Multithreading
+- Global hotkey handling
+- State management
+- Event-driven programming
+- Timing and progress calculations
+- User-configurable application settings
+- Debugging a larger Python application
 
 ## Future Improvements
 
 Possible future improvements include:
 
-- First-run master password setup
-- Secure key derivation from a master password
-- Automatic encryption-key management
-- Hidden password input using `getpass`
-- Search and edit functionality
-- Graphical user interface
-- Stronger validation and error handling
+- Save user settings between sessions
+- Cleaner separation between GUI and typing logic
+- Cross-platform hotkey testing
+- More robust input validation
+- Additional pause behavior controls
+- Packaging the application as a standalone executable
+- Automated tests for timing and text-processing logic
 
-## Disclaimer
+## Responsible Use
 
-This project is intended for educational and personal learning purposes. It should not be treated as a production-grade password manager without additional security review and development.
+This project is intended for legitimate automation, testing, accessibility, and personal programming practice. Users are responsible for following the rules, policies, and terms of service of any software or platform where the tool is used.
